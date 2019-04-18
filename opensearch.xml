@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+<ShortName>LocalPrefixes</ShortName>
+<Description>Search via local prefixes</Description>
+<InputEncoding>UTF-8</InputEncoding>
+<LongName>Local Prefixes Search</LongName>
+<Image height="22" width="22">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNAay06AAAAIqSURBVDiNtZPBahNRFIa/O7HShiQurDZYcJlVW8RSEN3kBZJlRaVooRV8AH0LseCm4qIbM+1acaXoqiA0dGErYkQQIbVQRElqLDXnHBczTZqETsZFDhy4c+7h4+e//zgzYxDlDYQKnDr+sTIxdQdYAs78L2h++707EfzlT+NxApe6t+aTnZmJDV2ZmOqZdYBRS10cGebl7fnY0KuvXqOq0WBVRUQoXrsSC/p8/R3b33YQkWiwqCAiCHCwtdWa7+ZyAGQrldZseHISEcHzXH+wqgZwjCbtGO5NTwMwWvnUFoEhKnjOQ7QX3BE3VUFFaBod3cjnaeTzPXMVwXMO7atYDBHtUZy8HCg+PhOC3cCKfo9ngqjQHEly+OQphBaMh/eH5c3gUKlweulRaIWLYYUoKoI2fqN3F8is+oyH4KPOrProjevBToQVXR4HcZPQw1/Ly4zt73MBWl0vlWgaiBGZig6wqAYdgrM3b5FIpaj6PlXfB+BcodgGq4ZWxPxBBCCdYqxYZHNxgZ/lMgA/yhvk7j/ga+kZQqjYxcqxoIAALpVmfXaWZr3euv/+5i17G2WG0mmEMG6eFyNuqghBrOo71Z5lgGa9xkG9RmL0bGQqusCGWNvjqAoeL/T4pBw755JAdi6RQJ1DMDJTk9FgDFXh88cPqArOuUtADdg1s4YzM5xzBYA55xbPQyFaa2c9NCt2z8zsxRE4CWSBDJAEhsJznKoBf4FGj+JB1D9t/GPTH9F5+AAAAABJRU5ErkJggg==</Image><Url type="text/html" method="get" template="http://localhost:1123/search/?q={searchTerms}"/></OpenSearchDescription>

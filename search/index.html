@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    <head>
+        <link title="LocalPrefixes" type="application/opensearchdescription+xml" rel="search" href="http://localhost:1123/opensearch.xml">
+        <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+        <script type="text/javascript">
+            // Helper functions for our search routine
+            
+            function parse_query(querystring) {
+                /* Given a typical web query string
+                 * ("param=value&param2=value2"), parses same and returns it in
+                 # the form of an associative array.
+                 */
+                
+                var query_assoc = new Array();
+                
+                querystring.split(/\&/).forEach(function(keyvalue) {
+                        var key = keyvalue.split(/=/);
+                        query_assoc[key[0]] = key[1];
+                        });
+                
+                return query_assoc;
+            }
+            
+            function post_to_url(path, paramsstring, method) {
+                /* Given a form action URL, a string of parameters for that
+                 * URL, and (optionally) a submission method, parses those
+                 * parameters into a virtual form in the document DOM and
+                 * submits it. Intended to be a rough POST-based analogue to
+                 * use of document.location.replace() for GET submissions.
+                 *
+                 * Based on an example provided by Rakesh Pai, found at:
+                 * http://stackoverflow.com/a/133997
+                 */
+                
+                method = method || "post";
+                
+                var form = document.createElement("form");
+                var params = parse_query(paramsstring);
+                
+                // make a copy of the form's submit() method so that it doesn't
+                // get potentially accidentally overwritten by a "submit"
+                // parameter.
+                form._submit_function_ = form.submit;
+                
+                // stuff in our parameters
+                form.setAttribute("method", method);
+                form.setAttribute("action", path);
+                
+                for(var key in params) {
+                    if (params.hasOwnProperty(key)) {  // because Javascript :P
+                        var hiddenField = document.createElement("input");
+                        hiddenField.setAttribute("type", "hidden");
+                        hiddenField.setAttribute("name", key);
+                        hiddenField.setAttribute("value",
+                                decodeURIComponent(params[key]));
+                        
+                        form.appendChild(hiddenField);
+                    }
+                }
+                
+                // all parameters are in; time to add it to the document and
+                // submit
+                document.body.appendChild(form);
+                form._submit_function_();
+            }
+            
+            function get_tokenized_querystring() {
+                /* Returns a tokenized search string from our URL -whether the
+                 * elements are just tacked onto the end, or provided as
+                 * arguments to a q= parameter).
+                 */
+                
+                var querystring = document.location.search;
+                if (/.*[?&][qp]=/.test(querystring)) {
+                    // this is for anything that uses "q" as a search query
+                    // parameter that we may be trying to emulate or otherwise
+                    // proxy
+                    querystring = querystring.replace(/.*[?&][qp]=/,"");
+                            // chop all but query
+                    querystring = querystring.replace(/&[A-Za-z0-9]*=.*/,"");
+                            // chop any trailing params
+                } else {
+                    // this is for the file:// uri folks, who'll just tack
+                    // params on the end
+                    querystring = querystring.substring(1); // chop leading "?"
+                }
+                querystring = decodeURIComponent(querystring);
+                
+                // split up into individual params
+                var inputquery = querystring.split("+");
+                if (inputquery.length < 2) {
+                    // probably a different split delimiter because SOME
+                    // browser setups 
+                    // *cough*cough*firefoxwithkeywordurlhack*cough* pass the
+                    // spring space-delimited, while EVERYTHING ELSE does
+                    // plus-delimited. GRARGH.
+                    inputquery = querystring.split(" ");
+                }
+                
+                return inputquery;
+            }
+            
+            function search_with_querystring(inputquery) {
+                /* Given a tokenized series of strings that represent our
+                 * search parameters, sends those parameters to our designated
+                 * search engine.
+                 */
+                
+                // the first parameter of our query will generally be the
+                // search engine keyword. we don't want that to be part of the
+                // actual search string.
+                // OTOH, if there is no search keyword and we're just using the
+                // default, we don't want to eat the first word of that string
+                // either.
+                // so we check the first parameter to see if it really is a
+                // keyword before we shift() it out of the array.
+                var searchinfo = searchURLs[inputquery[0]]
+                if (searchinfo == undefined) {
+                    searchinfo = searchURLs[searchURLs['__default__']]
+                } else {
+                    inputquery.shift();
+                }
+                
+                // check for shorthand format and convert it to full searchinfo
+                // format if needed
+                if (searchinfo[0] != undefined) {
+                    searchinfo = { 'url': searchinfo };
+                }
+                
+                // THROW ZE SVITCH
+                if (searchinfo['post'] != undefined) {
+                    var postquery = searchinfo['post'].replace("%s",
+                            encodeURIComponent(inputquery.join(" ")));
+                    post_to_url(redirUrl, postQuery);
+                } else if (searchinfo['auto'] != undefined) {
+                    searchinfo['auto'](inputquery.join(" "),function(redirResults) {
+                        var resultsList = document.createElement("ul");
+                        var body = document.getElementsByTagName('body')[0]
+                        if (redirResults.length == 1) {
+                            document.location.replace(redirResults[0].url);
+                        } else if (redirResults.length == 0) {
+                            var resultItem = document.createElement("li");
+                            resultItem.innerHTML = "No results!";
+                            resultsList.appendChild(resultItem);
+                        } else {
+                            for (var i = 0, len = redirResults.length; i < len; i++) {
+                                var resultItem = document.createElement("li");
+                                var resultText = document.createElement("a");
+                                resultText.href = redirResults[i].url;
+                                resultText.innerHTML = redirResults[i].value;
+                                resultItem.appendChild(resultText);
+                                resultsList.appendChild(resultItem);
+                            }
+                        }
+                        body.appendChild(resultsList);
+                    });
+                } else {
+                    var redirUrl = searchinfo['url'].replace("%s",
+                            encodeURIComponent(inputquery.join(" ")));
+                    //alert(redirUrl);  // DEBUG
+                    document.location.replace(redirUrl);
+                }
+            }
+            
+        </script>
+        <script src="searchurls.js"></script> <!-- gets us var searchURLs -->
+    </head>
+    <body>
+<script type="text/javascript">
+
+var body = document.getElementsByTagName('body')[0]
+
+if (document.location.search != "") {
+    // indicate that we're doing a search, and go ahead and do it
+    var message = document.createElement("p");
+    message.innerHTML = "Search in progress...";
+    body.appendChild(message);
+    search_with_querystring(get_tokenized_querystring());
+    message.innerHTML = "Search results:";
+} else {
+    // create a form that submits via GET to *this* page
+    var message = document.createElement("p");
+    message.innerHTML = "Search:";
+    body.appendChild(message);
+    
+    var searchform = document.createElement("form");
+    searchform.setAttribute("method", "get");
+    searchform.setAttribute("path", document.location);
+    
+    var inputbox = document.createElement("input");
+    inputbox.setAttribute("type", "search");
+    inputbox.setAttribute("name", "q");
+    searchform.appendChild(inputbox);
+    
+    /*var submitbutton = document.createElement("input");
+    submitbutton.setAttribute("type", "submit");
+    submitbutton.setAttribute("name", "Search");
+    searchform.appendChild(submitbutton);*/
+    
+    body.appendChild(searchform);
+}
+
+</script>
+</body>
+</html>
