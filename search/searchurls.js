@@ -16,10 +16,10 @@
 var searchURLs = {
     '__default__': 's',
     // Startpage search
-    'g': 'https://startpage.com/do/search?query=%s&prfe=36c84513558a2d34bf0d89ea505333ad59fcc4f8848a538a0c1c89932309a9bccf4a01af04c18cea040217a30efffa7b',
-    's': 'https://startpage.com/do/search?query=%s&prfe=36c84513558a2d34bf0d89ea505333ad59fcc4f8848a538a0c1c89932309a9bccf4a01af04c18cea040217a30efffa7b',
+    'g': 'https://www.startpage.com/sp/search?query=%s&prfe=d3ebddf71b6a20152e5d28647f54b2b39e1a59c32f71e9ab5621b0bd186d7156d13de6acded60f70b79ba6a7a5b9f9c50cdb637fb454d280f81344eb8d49583458b340ec1e5a25ea83c3ce2c33c296f2d1',
+    's': 'https://www.startpage.com/sp/search?query=%s&prfe=d3ebddf71b6a20152e5d28647f54b2b39e1a59c32f71e9ab5621b0bd186d7156d13de6acded60f70b79ba6a7a5b9f9c50cdb637fb454d280f81344eb8d49583458b340ec1e5a25ea83c3ce2c33c296f2d1',
     // Startpage Image Search
-    'i': 'https://startpage.com/do/search?query=%s&cat=pics&prfe=36c84513558a2d34bf0d89ea505333ad59fcc4f8848a538a0c1c89932309a9bccf4a01af04c18cea040217a30efffa7b',
+    'i': 'https://www.startpage.com/sp/search?query=%s&cat=pics&prfe=d3ebddf71b6a20152e5d28647f54b2b39e1a59c32f71e9ab5621b0bd186d7156d13de6acded60f70b79ba6a7a5b9f9c50cdb637fb454d280f81344eb8d49583458b340ec1e5a25ea83c3ce2c33c296f2d1',
     // Google Search
     'go': 'https://www.google.com/search?hl=en&q=%s',
     // Amazon
