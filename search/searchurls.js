@@ -65,7 +65,8 @@ var searchURLs = {
                     }));
                 }
             };
-            xmlhttp.open("POST", "https://cors-anywhere.herokuapp.com/http://sportsforecaster.com/modules/player_search_update.php?sport=nhl");
+            //xmlhttp.open("POST", "https://cors-anywhere.herokuapp.com/http://sportsforecaster.com/modules/player_search_update.php?sport=nhl");
+            xmlhttp.open("POST", "https://cors.bridged.cc/http://sportsforecaster.com/modules/player_search_update.php?sport=nhl");
             xmlhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
             xmlhttp.send();
         })
