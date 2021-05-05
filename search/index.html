@@ -191,6 +191,7 @@ if (document.location.search != "") {
     var inputbox = document.createElement("input");
     inputbox.setAttribute("type", "search");
     inputbox.setAttribute("name", "q");
+    inputbox.setAttribute("style", "width: 100%; font-size: 2em");
     searchform.appendChild(inputbox);
     
     /*var submitbutton = document.createElement("input");
@@ -199,6 +200,7 @@ if (document.location.search != "") {
     searchform.appendChild(submitbutton);*/
     
     body.appendChild(searchform);
+    inputbox.focus();
 }
 
 </script>
