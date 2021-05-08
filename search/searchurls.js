@@ -16,18 +16,34 @@
 var searchURLs = {
     '__default__': 's',
     // Startpage search
-    'g': 'https://www.startpage.com/sp/search?query=%s&prfe=d3ebddf71b6a20152e5d28647f54b2b39e1a59c32f71e9ab5621b0bd186d7156d13de6acded60f70b79ba6a7a5b9f9c50cdb637fb454d280f81344eb8d49583458b340ec1e5a25ea83c3ce2c33c296f2d1',
-    's': 'https://www.startpage.com/sp/search?query=%s&prfe=d3ebddf71b6a20152e5d28647f54b2b39e1a59c32f71e9ab5621b0bd186d7156d13de6acded60f70b79ba6a7a5b9f9c50cdb637fb454d280f81344eb8d49583458b340ec1e5a25ea83c3ce2c33c296f2d1',
+    //'g': 'https://www.startpage.com/sp/search?query=%s&prfe=d97e49589e3e9ecdd49bb22a154a5b1f9aac477c1c4aa671dea5cc2da8b021b308e3440e8e4cb6c9b2718a2793d075470da6dbc3fd6a48a8e64fc8796991feb89ddbdac659784474e3cf79cddcba',
+    's': 'https://www.startpage.com/do/search?q=%s&segment=startpage.vivaldi&prfe=d97e49589e3e9ecdd49bb22a154a5b1f9aac477c1c4aa671dea5cc2da8b021b308e3440e8e4cb6c9b2718a2793d075470da6dbc3fd6a48a8e64fc8796991feb89ddbdac659784474e3cf79cddcba',
     // Startpage Image Search
-    'i': 'https://www.startpage.com/sp/search?query=%s&cat=pics&prfe=d3ebddf71b6a20152e5d28647f54b2b39e1a59c32f71e9ab5621b0bd186d7156d13de6acded60f70b79ba6a7a5b9f9c50cdb637fb454d280f81344eb8d49583458b340ec1e5a25ea83c3ce2c33c296f2d1',
+    'i': 'https://www.startpage.com/do/search?q=%s&segment=startpage.vivaldi&cat=pics&prfe=d97e49589e3e9ecdd49bb22a154a5b1f9aac477c1c4aa671dea5cc2da8b021b308e3440e8e4cb6c9b2718a2793d075470da6dbc3fd6a48a8e64fc8796991feb89ddbdac659784474e3cf79cddcba',
+    // Startpage News Search
+    'n': 'https://www.startpage.com/do/search?q=%s&segment=startpage.vivaldi&cat=news&prfe=d97e49589e3e9ecdd49bb22a154a5b1f9aac477c1c4aa671dea5cc2da8b021b308e3440e8e4cb6c9b2718a2793d075470da6dbc3fd6a48a8e64fc8796991feb89ddbdac659784474e3cf79cddcba',
+    // deprecated
+    'g': {
+        'url': 'index.html',
+        'auto': (function (querystring, runQueryCB) {
+            querystring = querystring.replace(/^g/, 's');
+            runQueryCB([{
+                'value': 'Stop doing that; "g" is deprecated in favor of "s"',
+                'url': '.'
+                },{
+                'value': 'You want this instead',
+                'url': 'index.html?q=s ' + querystring
+                }]);
+        })
+    },
     // Google Search
     'go': 'https://www.google.com/search?hl=en&q=%s',
     // Amazon
-    'z': 'http://www.amazon.com/exec/obidos/external-search?tag=opera-20&index=blended&keyword=%s',
+    'z': 'http://www.amazon.com/exec/obidos/external-search?index=blended&keyword=%s',
     // eBay
     'e': 'http://www.ebay.com/sch/i.html?_from=R40&_trksid=m570.l1313&_nkw=%s&_sacat=0',
     // DuckDuckGo
-    'd': 'http://duckduckgo.com/?t=ous&q=%s',
+    'd': 'http://duckduckgo.com/?t=vivaldi&q=%s',
     // Wikipedia
     'p': 'http://en.wikipedia.org/wiki/Special:Search?search=%s&go=Go',
     'w': 'http://en.wikipedia.org/wiki/Special:Search?search=%s&go=Go',
@@ -36,7 +52,7 @@ var searchURLs = {
     // The Internet Movie Firearms Database (IMFDb)
     'mf': 'http://www.imfdb.org/index.php?search=%s&go=Go&title=Special%3ASearch',
     // The W3C Markup Validation Service
-    'v': 'http://validator.w3.org/check?uri=%s',
+    //'v': 'http://validator.w3.org/check?uri=%s',
     // Google Image Search
     'gi': 'https://www.google.com/search?tbm=isch&q=%s',
     // GameFAQs
@@ -74,19 +90,19 @@ var searchURLs = {
     // eliteprospects.com
     'ep': 'https://www.eliteprospects.com/search/player?q=%s',
     // Hockey Reference
-    'hr': 'http://www.hockey-reference.com/player_search.cgi?search=%s',
+    //'hr': 'http://www.hockey-reference.com/player_search.cgi?search=%s',
     // CapFriendly
     'cf': 'https://capfriendly.com/teams/%s',
     // PuckPedia
-    'pp': 'https://puckpedia.com/players/search/%s',
+    //'pp': 'https://puckpedia.com/players/search/%s',
     // Dragon Age Wiki
-    'da': 'http://dragonage.wikia.com/wiki/Special:Search?search=%s',
+    //'da': 'http://dragonage.wikia.com/wiki/Special:Search?search=%s',
     // HockeyDB
     'h': 'http://www.hockeydb.com/ihdb/stats/findplayer.php?full_name=%s',
     // The Hypertext d20 SRD
     'srd': 'http://www.d20srd.org/search.htm?q=%s',
     // Pathfinder SRD
-    'psrd': 'http://www.google.com/cse?cx=006680642033474972217%3A6zo0hx_wle8&q=%s',
+    //'psrd': 'http://www.google.com/cse?cx=006680642033474972217%3A6zo0hx_wle8&q=%s',
     // Google Play Android App Store
     'a': 'https://play.google.com/store/search?q=%s&c=apps',
     // TVTropes
