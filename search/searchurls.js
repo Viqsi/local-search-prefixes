@@ -62,28 +62,55 @@ var searchURLs = {
     //    'url': 'http://forecaster.thehockeynews.com/hockeynews/hockey/playerindex.cgi',
     //    'post': 'x_param=search&x_option=%s',
     //},
+    //'tsf': {
+    //    'url': 'http://sportsforecaster.com/nhl/',
+    //    'auto': (function (queryString, runQueryCB) {
+    //        var xmlhttp = new XMLHttpRequest();
+    //        xmlhttp.onreadystatechange = function() {
+    //            if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+    //                var sourcearray = JSON.parse(xmlhttp.responseText.replace(
+    //                        /\r?\n|\r/g, '').replace(
+    //                        /.*playersearchbox"\)\.autocomplete\({ *source: *\[/, '[').replace(
+    //                        /],.*/, ']').replace(
+    //                        /\s+/g, ' ').replace(
+    //                        /value:/g, '"value":').replace(
+    //                        /url: "/g, '"url": "http://sportsforecaster.com'));
+    //                var queryRegex = new RegExp(".*" + queryString + ".*", 'i');
+    //                runQueryCB(sourcearray.filter(function(arrItem) {
+    //                    return arrItem.value.match(queryRegex);
+    //                }));
+    //            }
+    //        };
+    //        //xmlhttp.open("POST", "https://cors-anywhere.herokuapp.com/http://sportsforecaster.com/modules/player_search_update.php?sport=nhl");
+    //        xmlhttp.open("POST", "https://cors.bridged.cc/http://sportsforecaster.com/modules/player_search_update.php?sport=nhl");
+    //        xmlhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    //        xmlhttp.send();
+    //    })
+    //},
     'tsf': {
-        'url': 'http://sportsforecaster.com/nhl/',
+        'url': 'https://sportsforecaster.com/api/team/players/filter/nhl/all/%s',
         'auto': (function (queryString, runQueryCB) {
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = function() {
                 if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                    var sourcearray = JSON.parse(xmlhttp.responseText.replace(
+                    var testtext = xmlhttp.responseText.replace(
                             /\r?\n|\r/g, '').replace(
-                            /.*playersearchbox"\)\.autocomplete\({ *source: *\[/, '[').replace(
-                            /],.*/, ']').replace(
-                            /\s+/g, ' ').replace(
-                            /value:/g, '"value":').replace(
-                            /url: "/g, '"url": "http://sportsforecaster.com'));
-                    var queryRegex = new RegExp(".*" + queryString + ".*", 'i');
-                    runQueryCB(sourcearray.filter(function(arrItem) {
-                        return arrItem.value.match(queryRegex);
-                    }));
+                            /^{"players":{"1":/, '').replace(
+                            /,"2":\[\]}}$/, '');
+                    //console.log(xmlhttp.responseText);
+                    //console.log(testtext);
+                    var sourcearray = JSON.parse(testtext);
+                    var endarray = [];
+                    sourcearray.forEach(playerObj => {
+                        endarray.push({
+                            'value': playerObj['name_position'] + ' (' +  playerObj['city_career_stats'] + ')',
+                            'url': 'https://sportsforecaster.com/nhl/p/' + playerObj['tsf_global_id'] + '/' + playerObj['full_name']
+                        });
+                    });
+                    runQueryCB(endarray);
                 }
             };
-            //xmlhttp.open("POST", "https://cors-anywhere.herokuapp.com/http://sportsforecaster.com/modules/player_search_update.php?sport=nhl");
-            xmlhttp.open("POST", "https://cors.bridged.cc/http://sportsforecaster.com/modules/player_search_update.php?sport=nhl");
-            xmlhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            xmlhttp.open("GET", 'https://sportsforecaster.com/api/team/players/filter/nhl/all/%s'.replace("%s", encodeURIComponent(queryString)));
             xmlhttp.send();
         })
     },
