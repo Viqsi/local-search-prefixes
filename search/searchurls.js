@@ -96,7 +96,10 @@ var searchURLs = {
                     var testtext = xmlhttp.responseText.replace(
                             /\r?\n|\r/g, '').replace(
                             /^{"players":{"1":/, '').replace(
-                            /,"2":\[.*\]}}$/, '');
+                            /\],"2":\[/, ',').replace(
+                            /^\[,/, '[').replace(
+                            /,\]/, ']').replace(
+                            /}}$/, '');
                     //console.log(xmlhttp.responseText);
                     //console.log(testtext);
                     var sourcearray = JSON.parse(testtext);
