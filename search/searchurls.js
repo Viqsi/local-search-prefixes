@@ -87,33 +87,60 @@ var searchURLs = {
     //        xmlhttp.send();
     //    })
     //},
+    //'tsf': {
+    //    'url': 'https://sportsforecaster.com/api/team/players/filter/nhl/all/%s',
+    //    'auto': (function (queryString, runQueryCB) {
+    //        var xmlhttp = new XMLHttpRequest();
+    //        xmlhttp.onreadystatechange = function() {
+    //            if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+    //                var testtext = xmlhttp.responseText.replace(
+    //                        /\r?\n|\r/g, '').replace(
+    //                        /^{"players":{"1":/, '').replace(
+    //                        /\],"2":\[/, ',').replace(
+    //                        /^\[,/, '[').replace(
+    //                        /,\]/, ']').replace(
+    //                        /}}$/, '');
+    //                //console.log(xmlhttp.responseText);
+    //                //console.log(testtext);
+    //                var sourcearray = JSON.parse(testtext);
+    //                var endarray = [];
+    //                sourcearray.forEach(playerObj => {
+    //                    endarray.push({
+    //                        'value': playerObj['name_position'] + ' (' +  playerObj['city_career_stats'] + ')',
+    //                        'url': 'https://sportsforecaster.com/nhl/p/' + playerObj['tsf_global_id'] + '/' + playerObj['full_name']
+    //                    });
+    //                });
+    //                runQueryCB(endarray);
+    //            }
+    //        };
+    //        xmlhttp.open("GET", 'https://sportsforecaster.com/api/team/players/filter/nhl/all/%s'.replace("%s", encodeURIComponent(queryString)));
+    //        xmlhttp.send();
+    //    })
+    //},
     'tsf': {
-        'url': 'https://sportsforecaster.com/api/team/players/filter/nhl/all/%s',
+        'url': 'https://sportsforecaster.com/nhl/',
         'auto': (function (queryString, runQueryCB) {
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = function() {
                 if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                    var testtext = xmlhttp.responseText.replace(
-                            /\r?\n|\r/g, '').replace(
-                            /^{"players":{"1":/, '').replace(
-                            /\],"2":\[/, ',').replace(
-                            /^\[,/, '[').replace(
-                            /,\]/, ']').replace(
-                            /}}$/, '');
-                    //console.log(xmlhttp.responseText);
-                    //console.log(testtext);
-                    var sourcearray = JSON.parse(testtext);
+                    var baseinfo = JSON.parse(xmlhttp.responseText);
+                    var sourcearray = baseinfo['players']["1"].concat(baseinfo['players']["2"]);
+                    var queryRegex = new RegExp(".*" + queryString + ".*", 'i');
+                    var filterarray = sourcearray.filter(function(arrItem) {
+                        return arrItem.name_position.match(queryRegex);
+                    });
+                    console.log(filterarray);
                     var endarray = [];
-                    sourcearray.forEach(playerObj => {
+                    filterarray.forEach(playerObj => {
                         endarray.push({
                             'value': playerObj['name_position'] + ' (' +  playerObj['city_career_stats'] + ')',
-                            'url': 'https://sportsforecaster.com/nhl/p/' + playerObj['tsf_global_id'] + '/' + playerObj['full_name']
+                            'url': 'https://sportsforecaster.com' + playerObj['player_link']
                         });
                     });
                     runQueryCB(endarray);
                 }
             };
-            xmlhttp.open("GET", 'https://sportsforecaster.com/api/team/players/filter/nhl/all/%s'.replace("%s", encodeURIComponent(queryString)));
+            xmlhttp.open("GET", "https://sportsforecaster.com/api/league/teams/nhl");
             xmlhttp.send();
         })
     },
