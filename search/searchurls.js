@@ -13,7 +13,13 @@
 // * the special keyword '__default__' should point to an existing keyword; it
 //   indicates the default search to use.
 
-var searchURLs = {
+function keywordSearchRegex(querywords) {
+    // borrowed from https://stackoverflow.com/a/41869757/2872102
+    return new RegExp("(?=.*?\\b" + 
+            querywords.split(" ").join(")(?=.*?\\b") + ").*", "i");
+}
+
+const searchURLs = {
     '__default__': 's',
     // Startpage search
     //'g': 'https://www.startpage.com/sp/search?query=%s&prfe=d97e49589e3e9ecdd49bb22a154a5b1f9aac477c1c4aa671dea5cc2da8b021b308e3440e8e4cb6c9b2718a2793d075470da6dbc3fd6a48a8e64fc8796991feb89ddbdac659784474e3cf79cddcba',
@@ -39,7 +45,8 @@ var searchURLs = {
     // Google Search
     'go': 'https://www.google.com/search?hl=en&q=%s',
     // Amazon
-    'z': 'http://www.amazon.com/exec/obidos/external-search?index=blended&keyword=%s',
+    //'z': 'http://www.amazon.com/exec/obidos/external-search?index=blended&keyword=%s',
+    'z': 'https://www.amazon.com/s?k=%s&tag=admarketus-20',
     // eBay
     'e': 'http://www.ebay.com/sch/i.html?_from=R40&_trksid=m570.l1313&_nkw=%s&_sacat=0',
     // DuckDuckGo
@@ -125,7 +132,7 @@ var searchURLs = {
                 if (xmlhttp.readyState==4 && xmlhttp.status==200) {
                     var baseinfo = JSON.parse(xmlhttp.responseText);
                     var sourcearray = baseinfo['players']["1"].concat(baseinfo['players']["2"]);
-                    var queryRegex = new RegExp(".*" + queryString + ".*", 'i');
+                    var queryRegex = keywordSearchRegex(queryString);
                     var filterarray = sourcearray.filter(function(arrItem) {
                         return arrItem.name_position.match(queryRegex);
                     });
