@@ -65,6 +65,7 @@ const searchURLs = {
     // GameFAQs
     'q': 'http://www.gamefaqs.com/search/index.html?game=%s&searchplatform=All+Platforms',
     // Forecaster.ca Hockey Player Info
+    // (They keep changing this one...)
     //'hn': {
     //    'url': 'http://forecaster.thehockeynews.com/hockeynews/hockey/playerindex.cgi',
     //    'post': 'x_param=search&x_option=%s',
