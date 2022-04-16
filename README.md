@@ -44,8 +44,8 @@ Preemptively Answered Questions
 Q: Where did you get the URLs you use?  
 A: For the most part, reverse engineering websites of interest (not much effort to that, admittedly, unless you count Sports Forecaster). In some cases, though, I poached them or variants from [Vivaldi](https://vivaldi.com)'s preloaded search prefixes, mostly to borrow search partner affiliate parameters because I like that project and want to support it. (I used to do the same with Opera before they turned evil.)
 
-Q: Why a search/ subdirectory?  
-A: Partly because of that whole "hijacking Bing" thing (see history, above), but mostly because I also started keeping my bookmarks (stored in [Lynx](https://en.wikipedia.org/wiki/Lynx_(web_browser)-like HTML files) in the same hierarchy so that they could be accessible via that Tiny Local Webserver.
+Q: Why a `search/` subdirectory?  
+A: Partly because of that whole "hijacking Bing" thing (see history, above), but mostly because I also started keeping my bookmarks (stored in [Lynx](https://en.wikipedia.org/wiki/Lynx_(web_browser))-like HTML files) in the same hierarchy so that they could be accessible via that Tiny Local Webserver.
 
 Q: What's with all the hockey-related searches?  
 A: I'm an obsessive Blue Jackets fan who likes to talk about this stuff with others and so find it convenient.
