@@ -132,7 +132,7 @@ const searchURLs = {
             xmlhttp.onreadystatechange = function() {
                 if (xmlhttp.readyState==4 && xmlhttp.status==200) {
                     var baseinfo = JSON.parse(xmlhttp.responseText);
-                    var sourcearray = baseinfo['players']["1"].concat(baseinfo['players']["2"]);
+                    var sourcearray = baseinfo['players'];
                     var queryRegex = keywordSearchRegex(queryString);
                     var filterarray = sourcearray.filter(function(arrItem) {
                         return arrItem.name_position.match(queryRegex);
