@@ -18,6 +18,11 @@ function keywordSearchRegex(querywords) {
     return new RegExp("(?=.*?\\b" + 
             querywords.split(" ").join(")(?=.*?\\b") + ").*", "i");
 }
+function uniqueByProp(array_of_objects, property) {
+    // borrowed from https://www.javascripttutorial.net/array/javascript-remove-duplicates-from-array/
+    return [...new Map(array_of_objects.map(
+            (item) => [item[property], item])).values()]
+}
 
 const searchURLs = {
     '__default__': 's',
@@ -64,7 +69,7 @@ const searchURLs = {
     'gi': 'https://www.google.com/search?tbm=isch&q=%s',
     // GameFAQs
     'q': 'http://www.gamefaqs.com/search/index.html?game=%s&searchplatform=All+Platforms',
-    // Forecaster.ca Hockey Player Info
+    // Sports Forecaster Hockey Player Info
     // (They keep changing this one...)
     //'hn': {
     //    'url': 'http://forecaster.thehockeynews.com/hockeynews/hockey/playerindex.cgi',
@@ -132,7 +137,12 @@ const searchURLs = {
             xmlhttp.onreadystatechange = function() {
                 if (xmlhttp.readyState==4 && xmlhttp.status==200) {
                     var baseinfo = JSON.parse(xmlhttp.responseText);
-                    var sourcearray = baseinfo['players'];
+                    // TSF is now stuffing in the same player objects twice in
+                    // the array with the only difference being the "sort
+                    // order" property. so we limit our search to players with
+                    // unique player IDs
+                    var sourcearray = uniqueByProp(
+                            baseinfo['players'], "player_id");
                     var queryRegex = keywordSearchRegex(queryString);
                     var filterarray = sourcearray.filter(function(arrItem) {
                         return arrItem.name_position.match(queryRegex);
