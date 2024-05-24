@@ -191,4 +191,6 @@ const searchURLs = {
     'b': 'http://web.archive.org/web/%s',
     // Google Translate
     'gt': 'https://translate.google.com/translate?sl=auto&tl=en&u=%s',
+    // Roblox Users
+    'rbu': 'https://www.roblox.com/search/users?keyword=%s',
     };
