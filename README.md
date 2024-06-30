@@ -9,19 +9,20 @@ Usage
 
 1. Fork this repo, then clone your fork.
 2. Create a search prefix in your web browser for this system.
-    - If your web browser lets you use file:// URIs for searches, then you can just use that. (`file://full/path/to/where/you/cloned/this/repo/search/?%s`)
+    - If your web browser lets you use file:// URIs for searches, then you can just use that. (`file://full/path/to/where/you/cloned/this/repo/search/?q=%s`)
     - If it doesn't, things get a little more complicated:
         1. Create a local webserver in the directory where you cloned your fork of this repo. Port 1123 is recommended as that's what the OpenSearch profile uses. (Nowadays I'm partial to using Python - `python -m http.server 1123`
-        2. Either add `http://localhost:1123/search/?%s` directly as a search prefix, OR if your browser doesn't even let you do that (Firefox, I'm looking at YOU), go to `http://localhost:1123/search/` and right-click on the search input box that shows up; this should allow you to add this as a search prefix.
+        2. Either add `http://localhost:1123/search/?q=%s` directly as a search prefix, OR if your browser doesn't even let you do that (Firefox, I'm looking at YOU), go to `http://localhost:1123/search/` and right-click on the search input box that shows up; this should allow you to add this as a search prefix.
 3. Make this search system the default.
 4. Edit `searchurls.js` to use your own custom search URLs as desired. The most basic form of operation works based on pattern substitution (`%s` is swapped out with any keywords). For anything more complicated than a GET, there's documentation in the comments and some commented-out examples.
 
-I have specifically gotten this working on Android using [Termux](https://termux.com). Regrettably, [Vivaldi on Android does not yet support custom searches](https://forum.vivaldi.net/topic/40148/customizable-search-engines), but I'm making do for now until they finally get that done (hopefully soon; upvote that feature request!).
+I have specifically gotten this working on Android using [Termux](https://termux.com), and on iPadOS using [iSH](https://ish.app) (the latter has so far required the egregious abuse of running `cat /dev/location > /dev/null &` as a keepalive; I am not proud of this).
 
 I've also included a few bits I've used to start up that "local webserver" under `.helperscripts/`. These include:
 - `httpd.ps1`, a Powershell script I use on my Win10 laptop; uses Python and is launched in the target directory. There may be some execution policy dance necessary to run it; I'm not certain (my powershell-fu is weak).
 - `localprefix.tar.gz`, a tarballed Automator Workflow app bundle for MacOS that launches `darkhttpd` (installed via Homebrew, so expected in `/usr/local/bin`) and assumes this repo has been cloned to `$HOME/Library/Bookmarks`. This hasn't been touched in a while due to catastrophically dwindling ex-loyalty to MacOS (blame Apple's no-more-32bit/no-OpenGL-only-Metal/screw-you-nvidia series of fiascoes).
-- I don't have an equivalent for Android in this repo, but it's a oneliner in a shell script in `$HOME/.termux/boot/`.
+- I don't have an equivalent for Android in this repo, but it's a oneliner in a shell script in `$HOME/.termux/boot/` (after one installs termux-boot, naturally).
+- I likewise don't have an equivalent for iPadOS in this repo, largely because I am shamed by the abuse tactics I have to use to make it work and would feel even more shamed if I were to attempt to automate same.
 
 
 It's Amazing How Long Some Spiteful Hacks Last, or This Thing's Origin Story
