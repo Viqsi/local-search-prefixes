@@ -16,7 +16,7 @@
 function keywordSearchRegex(querywords) {
     // borrowed from https://stackoverflow.com/a/41869757/2872102
     return new RegExp("(?=.*?\\b" + 
-            querywords.split(" ").join(")(?=.*?\\b") + ").*", "i");
+            querywords.split("%20").join(")(?=.*?\\b") + ").*", "i");
 }
 function uniqueByProp(array_of_objects, property) {
     // borrowed from https://www.javascripttutorial.net/array/javascript-remove-duplicates-from-array/
@@ -36,19 +36,24 @@ const searchURLs = {
     // deprecated
     'g': {
         'url': 'index.html',
-        'auto': (function (querystring, runQueryCB) {
-            querystring = querystring.replace(/^g/, 's');
-            runQueryCB([{
-                'value': 'Stop doing that; "g" is deprecated in favor of "s"',
-                'url': '.'
+        'auto': (async querystring => {
+            return new Promise((resolve, reject) => {
+                resolve([{
+                    'value': 'Stop doing that; "g" is deprecated in favor of "s"',
+                    'url': '.'
                 },{
-                'value': 'You want this instead',
-                'url': 'index.html?q=s ' + querystring
+                    'value': 'You want this instead',
+                    'url': `index.html?q=s ${querystring}`
                 }]);
+            })
         })
     },
     // Google Search
     'go': 'https://www.google.com/search?hl=en&q=%s',
+    // Ecosia ('t' for tree)
+    't': 'https://www.ecosia.org/search?tt=vivaldi&q=%s',
+    // Ecosia Images
+    'ti': 'https://www.ecosia.org/images?tt=vivaldi&q=%s',
     // Amazon
     //'z': 'http://www.amazon.com/exec/obidos/external-search?index=blended&keyword=%s',
     'z': 'https://www.amazon.com/s?k=%s&tag=admarketus-20',
@@ -71,95 +76,26 @@ const searchURLs = {
     'q': 'http://www.gamefaqs.com/search/index.html?game=%s&searchplatform=All+Platforms',
     // Sports Forecaster Hockey Player Info
     // (They keep changing this one...)
-    //'hn': {
-    //    'url': 'http://forecaster.thehockeynews.com/hockeynews/hockey/playerindex.cgi',
-    //    'post': 'x_param=search&x_option=%s',
-    //},
-    //'tsf': {
-    //    'url': 'http://sportsforecaster.com/nhl/',
-    //    'auto': (function (queryString, runQueryCB) {
-    //        var xmlhttp = new XMLHttpRequest();
-    //        xmlhttp.onreadystatechange = function() {
-    //            if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-    //                var sourcearray = JSON.parse(xmlhttp.responseText.replace(
-    //                        /\r?\n|\r/g, '').replace(
-    //                        /.*playersearchbox"\)\.autocomplete\({ *source: *\[/, '[').replace(
-    //                        /],.*/, ']').replace(
-    //                        /\s+/g, ' ').replace(
-    //                        /value:/g, '"value":').replace(
-    //                        /url: "/g, '"url": "http://sportsforecaster.com'));
-    //                var queryRegex = new RegExp(".*" + queryString + ".*", 'i');
-    //                runQueryCB(sourcearray.filter(function(arrItem) {
-    //                    return arrItem.value.match(queryRegex);
-    //                }));
-    //            }
-    //        };
-    //        //xmlhttp.open("POST", "https://cors-anywhere.herokuapp.com/http://sportsforecaster.com/modules/player_search_update.php?sport=nhl");
-    //        xmlhttp.open("POST", "https://cors.bridged.cc/http://sportsforecaster.com/modules/player_search_update.php?sport=nhl");
-    //        xmlhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    //        xmlhttp.send();
-    //    })
-    //},
-    //'tsf': {
-    //    'url': 'https://sportsforecaster.com/api/team/players/filter/nhl/all/%s',
-    //    'auto': (function (queryString, runQueryCB) {
-    //        var xmlhttp = new XMLHttpRequest();
-    //        xmlhttp.onreadystatechange = function() {
-    //            if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-    //                var testtext = xmlhttp.responseText.replace(
-    //                        /\r?\n|\r/g, '').replace(
-    //                        /^{"players":{"1":/, '').replace(
-    //                        /\],"2":\[/, ',').replace(
-    //                        /^\[,/, '[').replace(
-    //                        /,\]/, ']').replace(
-    //                        /}}$/, '');
-    //                //console.log(xmlhttp.responseText);
-    //                //console.log(testtext);
-    //                var sourcearray = JSON.parse(testtext);
-    //                var endarray = [];
-    //                sourcearray.forEach(playerObj => {
-    //                    endarray.push({
-    //                        'value': playerObj['name_position'] + ' (' +  playerObj['city_career_stats'] + ')',
-    //                        'url': 'https://sportsforecaster.com/nhl/p/' + playerObj['tsf_global_id'] + '/' + playerObj['full_name']
-    //                    });
-    //                });
-    //                runQueryCB(endarray);
-    //            }
-    //        };
-    //        xmlhttp.open("GET", 'https://sportsforecaster.com/api/team/players/filter/nhl/all/%s'.replace("%s", encodeURIComponent(queryString)));
-    //        xmlhttp.send();
-    //    })
-    //},
     'tsf': {
         'url': 'https://sportsforecaster.com/nhl/',
-        'auto': (function (queryString, runQueryCB) {
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                    var baseinfo = JSON.parse(xmlhttp.responseText);
-                    // TSF is now stuffing in the same player objects twice in
-                    // the array with the only difference being the "sort
-                    // order" property. so we limit our search to players with
-                    // unique player IDs
-                    var sourcearray = uniqueByProp(
-                            baseinfo['players'], "player_id");
-                    var queryRegex = keywordSearchRegex(queryString);
-                    var filterarray = sourcearray.filter(function(arrItem) {
-                        return arrItem.name_position.match(queryRegex);
-                    });
-                    console.log(filterarray);
-                    var endarray = [];
-                    filterarray.forEach(playerObj => {
-                        endarray.push({
-                            'value': playerObj['name_position'] + ' (' +  playerObj['city_career_stats'] + ')',
-                            'url': 'https://sportsforecaster.com' + playerObj['player_link']
-                        });
-                    });
-                    runQueryCB(endarray);
-                }
-            };
-            xmlhttp.open("GET", "https://sportsforecaster.com/api/league/teams/nhl");
-            xmlhttp.send();
+        'auto': (async querystring => {
+            return new Promise(async (resolve, reject) => {
+                const resdata = await fetch('https://sportsforecaster.com/api/league/teams/nhl');
+                const baseinfo = await resdata.json();
+                // TSF is now stuffing in the same player objects twice in the
+                // array with the only difference being the "sort order"
+                // property. so we limit our search to players with unique
+                // player IDs
+                const queryregex = keywordSearchRegex(querystring);
+                resolve(
+                    uniqueByProp(baseinfo.players, 'player_id')
+                    .filter(i => i.name_position.match(queryregex))
+                    .map(playerObj => {return {
+                        'value': `${playerObj.name_position} (${playerObj.city_career_stats})`,
+                        'url': `https://sportsforecaster.com${playerObj.player_link}`
+                    };})
+                );
+            })
         })
     },
     // eliteprospects.com
@@ -179,7 +115,7 @@ const searchURLs = {
     // Pathfinder SRD
     //'psrd': 'http://www.google.com/cse?cx=006680642033474972217%3A6zo0hx_wle8&q=%s',
     // Google Play Android App Store
-    'a': 'https://play.google.com/store/search?q=%s&c=apps',
+    'app': 'https://play.google.com/store/search?q=%s&c=apps',
     // TVTropes
     'tt': 'http://tvtropes.org/pmwiki/search_result.php?q=%s',
 
