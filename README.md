@@ -3,6 +3,8 @@ Local Search Prefixes
 
 This is a longstanding hack I've been carrying around for over a decade for handling search prefix keywords in web browsers. It's been through quite a lot, and most of the history is not able to be recorded in this repo (owing to it having been saved via NextCloud versioning rather than an actual source control system), but I grabbed what I could where I could.
 
+Most browsers support this sort of thing natively nowadays, but I keep this around largely because it lets me do arbitrary parsing of fetched results in those instances where sites have abandoned server-side search. That and it's portable between browsers.
+
 
 Usage
 -----
@@ -36,7 +38,7 @@ About two weeks later, our ISP started acting really flaky. And I was grumpy abo
 
 Two and a half years after that, in a bid to get it working with The Sports Forecaster's NHL player info search (note: this is a VERY frequently recurring theme throughout the history of this hack), I added POST support and made that available to the remaining N900 holdouts in that thread. And, in the interest of minimizing the number of times I had to keep updating search engines in multiple places, I had long since started syncing it between systems (first using Dropbox, then eventually OwnCloud and then NextCloud) and pointing my desktop web browsers at this same hack.
 
-Since then, this has gone through several evolutions. For the longest time, it was just a local file I'd point browsers to. Then I separated out the search URLs into their own file. Then, when I finally bit the bullet and went Android, I paired this together with a tiny local http server and some DNS trickery to "hijack" bing.com so as to sneak it in on browsers there. When that ceased to be necessary, I discovered that many mobile browser simply wouldn't *do* file:// URIs anymore and so kept that Tiny Local Webserver concept, and added an OpenSearch definition. And all throughout all that, I kept having to chase down Sports Forecaster's constantly changing search schemes even as they got rid of server-side search entirely - that, in particular, has been one of the few things that keeps sustaining the useful life of this hack for me.
+Since then, this has gone through several evolutions. For the longest time, it was just a local file I'd point browsers to. Then I separated out the search URLs into their own file. Then, when I finally bit the bullet and went Android, I paired this together with a tiny local http server and some DNS trickery to "hijack" bing.com so as to sneak it in on browsers there. When that ceased to be necessary, I discovered that many mobile browsers simply wouldn't *do* file:// URIs anymore and so kept that Tiny Local Webserver concept, and added an OpenSearch definition. And all throughout all that, I kept having to chase down Sports Forecaster's constantly changing search schemes even as they got rid of server-side search entirely - that, in particular, has been one of the few things that keeps sustaining the useful life of this hack for me.
 
 
 Preemptively Answered Questions
