@@ -43,7 +43,7 @@ const searchURLs = {
                     'url': '.'
                 },{
                     'value': 'You want this instead',
-                    'url': `index.html?q=s ${querystring}`
+                    'url': `index.html?q=s+${querystring}`
                 }]);
             })
         })
@@ -102,10 +102,39 @@ const searchURLs = {
     'ep': 'https://www.eliteprospects.com/search/player?q=%s',
     // Hockey Reference
     //'hr': 'http://www.hockey-reference.com/player_search.cgi?search=%s',
-    // CapFriendly
-    'cf': 'https://capfriendly.com/teams/%s',
+    // CapFriendly (deprecated)
+    //'cf': 'https://capfriendly.com/teams/%s',
+    'cf': {
+        'url': 'index.html',
+        'auto': (async querystring => {
+            return new Promise((resolve, reject) => {
+                resolve([{
+                    'value': 'Stop doing that; "cf" is deprecated in favor of "pp"',
+                    'url': '.'
+                },{
+                    'value': 'You want this instead',
+                    'url': `index.html?q=pp+${querystring}`
+                }]);
+            })
+        })
+    },
     // PuckPedia
     //'pp': 'https://puckpedia.com/players/search/%s',
+    'pp': {
+        'url': 'https://puckpedia.com/',
+        'auto': (async querystring => {
+            return new Promise(async (resolve, reject) => {
+                const resdata = await fetch(`https://puckpedia.com/puckpedia/person_search/autocomplete/search?q=${querystring}`);
+                const searchresults = await resdata.json();
+                resolve(
+                    searchresults.map(itemObj => {return {
+                        'value': itemObj.label.replace(/<span.*<\/i>([A-Za-z]*)<\/span>(.*)/, '$2 ($1)'),
+                        'url': `https://puckpedia.com/${itemObj.value}`
+                    };})
+                );
+            })
+        })
+    },
     // Dragon Age Wiki
     //'da': 'http://dragonage.wikia.com/wiki/Special:Search?search=%s',
     // HockeyDB
