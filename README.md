@@ -11,7 +11,7 @@ Usage
 2. Create a search prefix in your web browser for this system.
     - If your web browser lets you use file:// URIs for searches, then you can just use that. (`file://full/path/to/where/you/cloned/this/repo/search/?q=%s`)
     - If it doesn't, things get a little more complicated:
-        1. Create a local webserver in the directory where you cloned your fork of this repo. Port 1123 is recommended as that's what the OpenSearch profile uses. (Nowadays I'm partial to using Python - `python -m http.server 1123`
+        1. Create a local webserver serving files from the directory where you cloned your fork of this repo. Port 1123 is recommended as that's what the OpenSearch profile uses. (Nowadays I'm partial to using Python - `python -m http.server 1123`
         2. Either add `http://localhost:1123/search/?q=%s` directly as a search prefix, OR if your browser doesn't even let you do that (Firefox, I'm looking at YOU), go to `http://localhost:1123/search/` and right-click on the search input box that shows up; this should allow you to add this as a search prefix.
 3. Make this search system the default.
 4. Edit `searchurls.js` to use your own custom search URLs as desired. The most basic form of operation works based on pattern substitution (`%s` is swapped out with any keywords). For anything more complicated than a GET, there's documentation in the comments and some commented-out examples.
