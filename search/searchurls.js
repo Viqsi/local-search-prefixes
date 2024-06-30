@@ -135,6 +135,8 @@ const searchURLs = {
             })
         })
     },
+    // HockeyViz
+    'hv': 'https://hockeyviz.com/search?q=%s',
     // Dragon Age Wiki
     //'da': 'http://dragonage.wikia.com/wiki/Special:Search?search=%s',
     // HockeyDB
