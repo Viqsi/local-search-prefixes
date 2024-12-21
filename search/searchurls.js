@@ -4,9 +4,9 @@
 // * %s in the search url is replaced with query parameters.
 // * "auto" is for searches that use some kind of generic key: value list with
 //   a regex (see: jQuery 'autocomplete' widget). for these sorts of searches,
-//   the 'auto' attribute should point to a function that takes the query
-//   string to match against and a callback reference that accepts an array of
-//   objects with "value" and "url" properties.
+//   the 'auto' attribute should point to a Promise that takes the query
+//   string to match against, and which may optionally resolve to an array of
+//   'value'/'url' objects to display in a VERY ad-hoc manner.
 // * as a shorthand, for searches that don't need the 'post' or 'auto'
 //   parameters can just provide the url rather than that parameterized object,
 //   and it'll Just Work.
@@ -24,15 +24,18 @@ function uniqueByProp(array_of_objects, property) {
             (item) => [item[property], item])).values()]
 }
 
+// I use Startpage a lot and there's multiple searches based on it, so...
+const startpageBase = 'https://www.startpage.com/do/search?q=%s&segment=startpage.vivaldi&prfe=d97e49589e3e9ecdd49bb22a154a5b1f9aac477c1c4aa671dea5cc2da8b021b308e3440e8e4cb6c9b2718a2793d075470da6dbc3fd6a48a8e64fc8796991feb89ddbdac659784474e3cf79cddcba';
+
 const searchURLs = {
     '__default__': 's',
     // Startpage search
-    //'g': 'https://www.startpage.com/sp/search?query=%s&prfe=d97e49589e3e9ecdd49bb22a154a5b1f9aac477c1c4aa671dea5cc2da8b021b308e3440e8e4cb6c9b2718a2793d075470da6dbc3fd6a48a8e64fc8796991feb89ddbdac659784474e3cf79cddcba',
-    's': 'https://www.startpage.com/do/search?q=%s&segment=startpage.vivaldi&prfe=d97e49589e3e9ecdd49bb22a154a5b1f9aac477c1c4aa671dea5cc2da8b021b308e3440e8e4cb6c9b2718a2793d075470da6dbc3fd6a48a8e64fc8796991feb89ddbdac659784474e3cf79cddcba',
+    //'g': startpageBase,
+    's': startpageBase,
     // Startpage Image Search
-    'i': 'https://www.startpage.com/do/search?q=%s&segment=startpage.vivaldi&cat=pics&prfe=d97e49589e3e9ecdd49bb22a154a5b1f9aac477c1c4aa671dea5cc2da8b021b308e3440e8e4cb6c9b2718a2793d075470da6dbc3fd6a48a8e64fc8796991feb89ddbdac659784474e3cf79cddcba',
+    'i': `${startpageBase}&cat=pics`,
     // Startpage News Search
-    'n': 'https://www.startpage.com/do/search?q=%s&segment=startpage.vivaldi&cat=news&prfe=d97e49589e3e9ecdd49bb22a154a5b1f9aac477c1c4aa671dea5cc2da8b021b308e3440e8e4cb6c9b2718a2793d075470da6dbc3fd6a48a8e64fc8796991feb89ddbdac659784474e3cf79cddcba',
+    'n': `${startpageBase}&cat=news`,
     // deprecated
     'g': {
         'url': 'index.html',
@@ -58,22 +61,22 @@ const searchURLs = {
     //'z': 'http://www.amazon.com/exec/obidos/external-search?index=blended&keyword=%s',
     'z': 'https://www.amazon.com/s?k=%s&tag=admarketus-20',
     // eBay
-    'e': 'http://www.ebay.com/sch/i.html?_from=R40&_trksid=m570.l1313&_nkw=%s&_sacat=0',
+    'e': 'https://www.ebay.com/sch/i.html?_from=R40&_trksid=m570.l1313&_nkw=%s&_sacat=0',
     // DuckDuckGo
-    'd': 'http://duckduckgo.com/?t=vivaldi&q=%s',
+    'd': 'https://duckduckgo.com/?t=vivaldi&q=%s',
     // Wikipedia
-    'p': 'http://en.wikipedia.org/wiki/Special:Search?search=%s&go=Go',
-    'w': 'http://en.wikipedia.org/wiki/Special:Search?search=%s&go=Go',
+    'p': 'https://en.wikipedia.org/wiki/Special:Search?search=%s&go=Go',
+    'w': 'https://en.wikipedia.org/wiki/Special:Search?search=%s&go=Go',
     // The Internet Movie Database (IMDb)
-    'm': 'http://www.imdb.com/find?s=all&q=%s',
+    'm': 'https://www.imdb.com/find?s=all&q=%s',
     // The Internet Movie Firearms Database (IMFDb)
-    'mf': 'http://www.imfdb.org/index.php?search=%s&go=Go&title=Special%3ASearch',
+    'mf': 'https://www.imfdb.org/index.php?search=%s&go=Go&title=Special%3ASearch',
     // The W3C Markup Validation Service
     //'v': 'http://validator.w3.org/check?uri=%s',
     // Google Image Search
     'gi': 'https://www.google.com/search?tbm=isch&q=%s',
     // GameFAQs
-    'q': 'http://www.gamefaqs.com/search/index.html?game=%s&searchplatform=All+Platforms',
+    //'q': 'http://www.gamefaqs.com/search/index.html?game=%s&searchplatform=All+Platforms',
     // Sports Forecaster Hockey Player Info
     // (They keep changing this one...)
     'tsf': {
@@ -135,12 +138,54 @@ const searchURLs = {
             })
         })
     },
+    // CapWages
+    // This works (sorta), but it is ABSURDLY slow due to rate limiting from
+    // the free CORS proxy I'm using.
+    'cw': {
+        'url': 'https://capwages.com/',
+        'auto': (async querystring => {
+            return new Promise(async (resolve, reject) => {
+                // Like Forecaster and PuckPedia, these guys just provide a
+                // Big-Ass JSON List. Unlike those, these folks don't even HAVE
+                // a data access endpoint - they HARDCODE THE LIST AND EMBED IT
+                // IN THE APP BUNDLE. Which has a versionhashed filename
+                // because of course it does.
+                const idxresdata = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.capwages.com')}`);
+                //console.log("idxresdata", idxresdata);
+                const idx = await idxresdata.json();
+                const idxParser = new DOMParser();
+                const idxDoc = idxParser.parseFromString(idx.contents, "text/html")
+                const bundleURL = `https://www.capwages.com${
+                        new URL(idxDoc.querySelectorAll(
+                        'script[src*="_app"]')[0].src).pathname}`;
+                //console.log("bundleURL", bundleURL);
+                const docresdata = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(bundleURL)}`);
+                //console.log("docresdata", docresdata);
+                const bundledoc = await docresdata.json();
+                // Use of eval() is STUPIDLY risky here, but, well, because of
+                // the escaping involved I don't have much of a choice. :(
+                //console.log("bundledoc contents", bundledoc.contents);
+                const JSONdoc = eval(bundledoc.contents.match(/(JSON.parse\('{"data":.*'\)),/)[1]);
+                const queryregex = keywordSearchRegex(querystring);
+                //console.log("JSONdoc", JSONdoc);
+                resolve(
+                    JSONdoc.data.filter(i => i.name.match(queryregex))
+                    .map(itemObj => {return {
+                        'value': itemObj.name,
+                        'url': `https://www.capwages.com/${itemObj.type}s/${itemObj.slug}`
+                    };})
+                );
+            })
+        })
+    },
+    // Spotrac
+    'st': 'https://www.spotrac.com/search?q=%s',
     // HockeyViz
     'hv': 'https://hockeyviz.com/search?q=%s',
     // Dragon Age Wiki
     //'da': 'http://dragonage.wikia.com/wiki/Special:Search?search=%s',
     // HockeyDB
-    'h': 'http://www.hockeydb.com/ihdb/stats/findplayer.php?full_name=%s',
+    'h': 'https://www.hockeydb.com/ihdb/stats/findplayer.php?full_name=%s',
     // The Hypertext d20 SRD
     'srd': 'http://www.d20srd.org/search.htm?q=%s',
     // Pathfinder SRD
@@ -148,14 +193,14 @@ const searchURLs = {
     // Google Play Android App Store
     'app': 'https://play.google.com/store/search?q=%s&c=apps',
     // TVTropes
-    'tt': 'http://tvtropes.org/pmwiki/search_result.php?q=%s',
+    'tt': 'https://tvtropes.org/pmwiki/search_result.php?q=%s',
 
     // Port Columbus International Flight Number
     'pcia': 'https://flycolumbus.com/flights/flight-status?adi=A&q=%s',
     // Google Docs Viewer
-    'gdv': 'http://docs.google.com/viewer?url=%s',
+    'gdv': 'https://docs.google.com/viewer?url=%s',
     // Internet Archive Wayback Machine
-    'b': 'http://web.archive.org/web/%s',
+    'b': 'https://web.archive.org/web/%s',
     // Google Translate
     'gt': 'https://translate.google.com/translate?sl=auto&tl=en&u=%s',
     // Roblox Users
