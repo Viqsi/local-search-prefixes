@@ -83,19 +83,12 @@ const searchURLs = {
         'url': 'https://sportsforecaster.com/nhl/',
         'auto': (async querystring => {
             return new Promise(async (resolve, reject) => {
-                const resdata = await fetch('https://sportsforecaster.com/api/league/teams/nhl');
-                const baseinfo = await resdata.json();
-                // TSF is now stuffing in the same player objects twice in the
-                // array with the only difference being the "sort order"
-                // property. so we limit our search to players with unique
-                // player IDs
-                const queryregex = keywordSearchRegex(querystring);
+                const resdata = await fetch(`https://sportsforecaster.com/api/filtered/players/nhl/first_order/${querystring}`);
+                const searchresults = await resdata.json();
                 resolve(
-                    uniqueByProp(baseinfo.players, 'player_id')
-                    .filter(i => i.name_position.match(queryregex))
-                    .map(playerObj => {return {
-                        'value': `${playerObj.name_position} (${playerObj.city_career_stats})`,
-                        'url': `https://sportsforecaster.com${playerObj.player_link}`
+                    searchresults.players.map(itemObj => { return {
+                        'value': `${itemObj.name_position} (${itemObj.city_team_name})`,
+                        'url': `https://sportsforecaster.com${itemObj.player_link}`
                     };})
                 );
             })
