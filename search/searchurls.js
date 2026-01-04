@@ -83,10 +83,16 @@ const searchURLs = {
         'url': 'https://sportsforecaster.com/nhl/',
         'auto': (async querystring => {
             return new Promise(async (resolve, reject) => {
-                const resdata = await fetch(`https://sportsforecaster.com/api/filtered/players/nhl/first_order/${querystring}`);
-                const searchresults = await resdata.json();
+                /* There's two endpoints - one for active players and one for
+                 * inactive players. So we check both.
+                 */
+                const resdata1 = await fetch(`https://sportsforecaster.com/api/filtered/players/nhl/first_order/${querystring}`);
+                const resdata2 = await fetch(`https://sportsforecaster.com/api/filtered/players/nhl/second_order/${querystring}`);
+                const searchresults1 = await resdata1.json();
+                const searchresults2 = await resdata2.json();
+                const searchresults = searchresults1.players.concat(searchresults2.players);
                 resolve(
-                    searchresults.players.map(itemObj => { return {
+                    searchresults.map(itemObj => { return {
                         'value': `${itemObj.name_position} (${itemObj.city_team_name})`,
                         'url': `https://sportsforecaster.com${itemObj.player_link}`
                     };})
